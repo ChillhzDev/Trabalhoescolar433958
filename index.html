@@ -26,15 +26,20 @@
         .dark-mode .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
-          }
+        }
 
+        /* Ajustes para as postagens dentro do tema escuro */
         .dark-mode .post-text {
-            color: #f1f1f1; 
+            color: #f1f1f1; /* Cor clara para o texto nas postagens */
         }
 
         .dark-mode .card {
-            border-color: #444444; 
+            border-color: #444444; /* Cor da borda das postagens no tema escuro */
         }
+        
+        /* Ajuste de cor do texto para o tema claro também */
+        .post-text {
+            color: #000000; /* Cor preta para o texto nas postagens no tema claro */
         }
     </style>
 </head>
@@ -87,18 +92,4 @@
             let reader = new FileReader();
             reader.onloadend = function() {
                 let imgSrc = file ? `<img src="${reader.result}" class="img-fluid mt-2">` : '';
-                let postElement = `<div class='card p-3 mt-2'><p>${text}</p>${imgSrc}</div>`;
-                document.getElementById('postsContainer').innerHTML += postElement;
-            }
-            if (file) reader.readAsDataURL(file);
-            else reader.onloadend();
-            document.getElementById('postText').value = '';
-            document.getElementById('postImage').value = '';
-        });
-    </script>
-    
-    <!-- Scripts Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
-
+                let
