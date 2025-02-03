@@ -7,22 +7,30 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Personalização de tema escuro */
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
         body.dark-mode {
             background-color: #121212;
             color: #ffffff;
         }
+
         .dark-mode .navbar {
             background-color: #333333;
         }
+
         .dark-mode .card {
             background-color: #2a2a2a;
             color: #ffffff;
         }
+
         .dark-mode .form-control {
             background-color: #333333;
             color: #ffffff;
             border: 1px solid #555555;
         }
+
         .dark-mode .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
@@ -30,16 +38,36 @@
 
         /* Ajustes para as postagens dentro do tema escuro */
         .dark-mode .post-text {
-            color: #f1f1f1; /* Cor clara para o texto nas postagens */
+            color: #f1f1f1;
         }
 
         .dark-mode .card {
-            border-color: #444444; /* Cor da borda das postagens no tema escuro */
+            border-color: #444444;
         }
-        
-        /* Ajuste de cor do texto para o tema claro também */
+
+        /* Ajuste de cor do texto para o tema claro */
         .post-text {
-            color: #000000; /* Cor preta para o texto nas postagens no tema claro */
+            color: #000000;
+        }
+
+        /* Estilo para o bloco do e-mail */
+        #contactEmail {
+            display: none;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        #contactEmail a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        /* Menu ativo */
+        .navbar-nav .nav-item.active {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -53,10 +81,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#">Início</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Tópicos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Postar</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Contato</a></li>
+                    <li class="nav-item active" id="inicioNav"><a class="nav-link" href="#">Início</a></li>
+                    <li class="nav-item" id="postarNav"><a class="nav-link" href="#">Postar</a></li>
+                    <li class="nav-item" id="contatoNav"><a class="nav-link" href="#">Contato</a></li>
                     <li class="nav-item"><button id="toggleTheme" class="btn btn-dark">Tema Escuro</button></li>
                 </ul>
             </div>
@@ -74,24 +101,62 @@
         
         <h3 class="text-center">Últimas Postagens</h3>
         <div id="postsContainer" class="mt-3"></div>
+        
+        <!-- Bloco de Contato (e-mail) -->
+        <div id="contactEmail">
+            <p><strong>Email para contato:</strong> <a href="mailto:jhzmoura@gmail.com">jhzmoura@gmail.com</a></p>
+        </div>
     </div>
 
     <script>
-        // Script para alternar entre tema claro e escuro
+        // Função para alternar entre tema claro e escuro
         document.getElementById('toggleTheme').addEventListener('click', function() {
             document.body.classList.toggle('dark-mode');
             const themeText = document.body.classList.contains('dark-mode') ? 'Tema Claro' : 'Tema Escuro';
             this.textContent = themeText;
         });
 
-        // Script para o formulário de postagem
+        // Exibir o e-mail ao clicar na opção "Contato"
+        document.getElementById('contatoNav').addEventListener('click', function() {
+            const contactEmailDiv = document.getElementById('contactEmail');
+            contactEmailDiv.style.display = contactEmailDiv.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Carregar as postagens armazenadas
+        function loadPosts() {
+            const posts = JSON.parse(localStorage.getItem('posts')) || [];
+            const now = Date.now();
+            posts.forEach(post => {
+                // Verifica se a postagem é válida (menos de 48 horas)
+                if (now - post.timestamp <= 48 * 60 * 60 * 1000) {
+                    let imgSrc = post.image ? `<img src="${post.image}" class="img-fluid mt-2">` : '';
+                    let postElement = `<div class='card p-3 mt-2'>
+                                        <p class="post-text">${post.text}</p>${imgSrc}
+                                      </div>`;
+                    document.getElementById('postsContainer').innerHTML += postElement;
+                }
+            });
+        }
+
+        // Salvar postagem no localStorage
         document.getElementById('postForm').addEventListener('submit', function(event) {
             event.preventDefault();
             let text = document.getElementById('postText').value;
             let file = document.getElementById('postImage').files[0];
             let reader = new FileReader();
             reader.onloadend = function() {
-                let imgSrc = file ? `<img src="${reader.result}" class="img-fluid mt-2">` : '';
+                let post = {
+                    text: text,
+                    image: file ? reader.result : null,
+                    timestamp: Date.now() // Armazena o momento da postagem
+                };
+                // Armazenar as postagens no localStorage
+                const posts = JSON.parse(localStorage.getItem('posts')) || [];
+                posts.push(post);
+                localStorage.setItem('posts', JSON.stringify(posts));
+
+                // Exibir a postagem na página
+                let imgSrc = post.image ? `<img src="${post.image}" class="img-fluid mt-2">` : '';
                 let postElement = `<div class='card p-3 mt-2'>
                                     <p class="post-text">${text}</p>${imgSrc}
                                   </div>`;
@@ -102,6 +167,9 @@
             document.getElementById('postText').value = '';
             document.getElementById('postImage').value = '';
         });
+
+        // Carregar as postagens ao carregar a página
+        loadPosts();
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
