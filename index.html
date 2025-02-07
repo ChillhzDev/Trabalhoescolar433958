@@ -57,6 +57,31 @@
             background-color: #2a2a2a;
             color: #ffffff;
         }
+
+        /* Bloco de Contato (e-mail) */
+        #contactEmail {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: #808080;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        #contactEmail.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dark-mode #contactEmail {
+            background-color: #2a2a2a;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -72,13 +97,17 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item" id="postarNav"><a class="nav-link" href="#">Postar</a></li>
                     <li class="nav-item" id="contatoNav"><a class="nav-link" href="#">Contato</a></li>
                     <li class="nav-item"><button id="toggleTheme" class="btn btn-dark">Tema Escuro</button></li>
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- Bloco de Contato -->
+    <div id="contactEmail">
+        <p><strong>Email para contato:</strong> <a href="mailto:jhzmoura@gmail.com">jhzmoura@gmail.com</a></p>
+    </div>
 
     <script>
         // Exibir pop-up de boas-vindas
@@ -89,6 +118,18 @@
             setTimeout(() => popup.style.opacity = '0', 3000);
             setTimeout(() => popup.style.display = 'none', 3500);
         };
+
+        // Exibir e ocultar bloco de contato
+        document.getElementById('contatoNav').addEventListener('click', function() {
+            let contactEmailDiv = document.getElementById('contactEmail');
+            if (contactEmailDiv.classList.contains('show')) {
+                contactEmailDiv.classList.remove('show');
+                setTimeout(() => contactEmailDiv.style.display = 'none', 500);
+            } else {
+                contactEmailDiv.style.display = 'block';
+                setTimeout(() => contactEmailDiv.classList.add('show'), 10);
+            }
+        });
     </script>
 </body>
 </html>
