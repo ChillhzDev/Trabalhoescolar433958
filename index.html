@@ -45,19 +45,31 @@
             border-color: #444444;
         }
 
-        /* Estilo para o bloco do e-mail */
+        /* Estilo para o bloco de e-mail */
         #contactEmail {
             display: none;
             background-color: #f8f9fa;
             padding: 10px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
+            margin-top: 10px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s, transform 0.5s;
         }
 
         #contactEmail a {
             text-decoration: none;
             color: #007bff;
+        }
+
+        /* Animação de aparecer/desaparecer */
+        #contactEmail.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Menu ativo */
@@ -194,7 +206,7 @@
         // Exibir o e-mail ao clicar na opção "Contato"
         document.getElementById('contatoNav').addEventListener('click', function() {
             const contactEmailDiv = document.getElementById('contactEmail');
-            contactEmailDiv.style.display = contactEmailDiv.style.display === 'block' ? 'none' : 'block';
+            contactEmailDiv.classList.toggle('show'); // Altera a visibilidade com animação
         });
 
         // Carregar as postagens armazenadas
