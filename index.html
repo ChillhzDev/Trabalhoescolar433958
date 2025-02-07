@@ -30,21 +30,25 @@
       background-color: #007bff;
       border-color: #007bff;
     }
+    /* Ajustes para as postagens dentro do tema escuro */
     .dark-mode .post-text {
       color: #f1f1f1;
     }
     .dark-mode .card {
       border-color: #444444;
     }
+    /* Menu ativo */
     .navbar-nav .nav-item.active {
       font-weight: bold;
     }
+    /* Fazendo cada item do menu posicionar seus dropdowns de forma relativa */
     .navbar-nav .nav-item {
       position: relative;
     }
+    /* Estilo para o bloco de e-mail (dropdown) */
     #contactEmail {
       position: absolute;
-      top: 100%;
+      top: 100%; /* logo abaixo do item */
       left: 0;
       background-color: #f8f9fa;
       padding: 5px 10px;
@@ -64,6 +68,7 @@
       transform: translateY(0);
       pointer-events: auto;
     }
+    /* Estilo do pop-up de boas-vindas (mantido do exemplo anterior) */
     #welcomePopup {
       position: fixed;
       top: 0;
@@ -100,13 +105,25 @@
       color: #333;
       font-weight: bold;
     }
-    body.blur-background {
-      background-color: rgba(0, 0, 0, 0.7);
-      transition: background-color 0.5s ease;
+    /* Animação de digitação */
+    .typing-text {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      animation: typing 4s steps(40) 1s forwards, blink 0.75s step-end infinite;
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    @keyframes blink {
+      50% { border-color: transparent; }
     }
   </style>
 </head>
-<body class="blur-background">
+<body>
+  <!-- Barra de navegação -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand" href="#">Fórum</a>
@@ -138,17 +155,94 @@
     </div>
   </nav>
 
+  <!-- Formulário de Postagem -->
+  <div class="container mt-4">
+    <h2 class="text-center">Criar uma Postagem</h2>
+    <form id="postForm" class="mb-4">
+      <input type="text" id="postText" class="form-control mb-2" placeholder="Escreva algo..." required>
+      <input type="file" id="postImage" class="form-control mb-2">
+      <button type="submit" class="btn btn-primary">Publicar</button>
+    </form>
+    <h3 class="text-center">Últimas Postagens</h3>
+    <div id="postsContainer" class="mt-3"></div>
+  </div>
+
+  <!-- Pop-up de boas-vindas -->
   <div id="welcomePopup">
     <div id="popupContent">
       <span id="closePopup">X</span>
       <h1><span class="typing-text">Bem-vindo, aqui fazemos postagens rápidas para conversas</span></h1>
     </div>
   </div>
+
   <script>
+    // Fechar o pop-up de boas-vindas
     document.getElementById('closePopup').addEventListener('click', function() {
       document.getElementById('welcomePopup').style.display = 'none';
-      document.body.classList.remove('blur-background');
     });
+
+    // Alternar entre tema claro e escuro
+    document.getElementById('toggleTheme').addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
+      const themeText = document.body.classList.contains('dark-mode') ? 'Tema Claro' : 'Tema Escuro';
+      this.textContent = themeText;
+    });
+
+    // Exibir/ocultar o bloco de e-mail ao clicar em "Contato"
+    document.getElementById('contatoNav').addEventListener('click', function(e) {
+      e.preventDefault(); // Impede a ação do link
+      const contactEmailDiv = document.getElementById('contactEmail');
+      contactEmailDiv.classList.toggle('show');
+    });
+
+    // Carregar as postagens armazenadas
+    function loadPosts() {
+      const posts = JSON.parse(localStorage.getItem('posts')) || [];
+      const now = Date.now();
+      posts.forEach(post => {
+        if (now - post.timestamp <= 48 * 60 * 60 * 1000) {
+          let imgSrc = post.image ? `<img src="${post.image}" class="img-fluid mt-2">` : '';
+          let postElement = `<div class='card p-3 mt-2'>
+                                <p class="post-text">${post.text}</p>${imgSrc}
+                              </div>`;
+          document.getElementById('postsContainer').innerHTML += postElement;
+        }
+      });
+    }
+
+    // Salvar postagem no localStorage
+    document.getElementById('postForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      let text = document.getElementById('postText').value;
+      let file = document.getElementById('postImage').files[0];
+      let reader = new FileReader();
+      reader.onloadend = function() {
+        let post = {
+          text: text,
+          image: file ? reader.result : null,
+          timestamp: Date.now()
+        };
+        const posts = JSON.parse(localStorage.getItem('posts')) || [];
+        posts.push(post);
+        localStorage.setItem('posts', JSON.stringify(posts));
+        let imgSrc = post.image ? `<img src="${post.image}" class="img-fluid mt-2">` : '';
+        let postElement = `<div class='card p-3 mt-2'>
+                              <p class="post-text">${text}</p>${imgSrc}
+                            </div>`;
+        document.getElementById('postsContainer').innerHTML += postElement;
+      };
+      if (file) {
+        reader.readAsDataURL(file);
+      } else {
+        reader.onloadend();
+      }
+      document.getElementById('postText').value = '';
+      document.getElementById('postImage').value = '';
+    });
+
+    // Carregar as postagens na inicialização
+    loadPosts();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
