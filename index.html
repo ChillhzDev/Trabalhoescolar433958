@@ -41,15 +41,33 @@
             margin-top: 20px;
             text-align: left;
         }
+        .admin-code {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px;
+            width: 100px;
+            background-color: #222;
+            color: #fff;
+            border: 1px solid #808080;
+            border-radius: 5px;
+        }
+        .admin-controls {
+            display: none;
+            margin-left: 10px;
+            cursor: pointer;
+            color: red;
+        }
     </style>
 </head>
 <body>
+    <input type="password" id="adminCode" class="admin-code" placeholder="Código ADM">
     <div class="container">
         <h1>Faça seu Pedido</h1>
         <form id="orderForm">
             <input type="text" id="name" placeholder="Seu Nome" required>
             <select id="pizza" required>
-                <option value="Calabreso">Margherita</option>
+                <option value="Margherita">Margherita</option>
                 <option value="Pepperoni">Pepperoni</option>
                 <option value="Quatro Queijos">Quatro Queijos</option>
             </select>
@@ -64,12 +82,9 @@
             event.preventDefault();
             let name = document.getElementById('name').value;
             let pizza = document.getElementById('pizza').value;
-            let order = { name, pizza };
-            
             let orders = JSON.parse(localStorage.getItem('orders')) || [];
-            orders.push(order);
+            orders.push({ name, pizza });
             localStorage.setItem('orders', JSON.stringify(orders));
-            
             document.getElementById('orderForm').reset();
             loadOrders();
         });
@@ -77,12 +92,22 @@
         function loadOrders() {
             let orders = JSON.parse(localStorage.getItem('orders')) || [];
             let ordersDiv = document.getElementById('orders');
+            let adminCode = document.getElementById('adminCode').value;
             ordersDiv.innerHTML = '';
             orders.forEach((order, index) => {
-                ordersDiv.innerHTML += `<p><strong>${order.name}</strong> pediu uma pizza <strong>${order.pizza}</strong></p>`;
+                let adminControls = adminCode === 'friesforhave' ? `<span class='admin-controls' onclick='deleteOrder(${index})'>[X]</span>` : '';
+                ordersDiv.innerHTML += `<p><strong>${order.name}</strong> pediu uma pizza <strong>${order.pizza}</strong> ${adminControls}</p>`;
             });
         }
 
+        function deleteOrder(index) {
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.splice(index, 1);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            loadOrders();
+        }
+
+        document.getElementById('adminCode').addEventListener('input', loadOrders);
         loadOrders();
     </script>
 </body>
