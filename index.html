@@ -57,10 +57,9 @@
             border-radius: 5px;
         }
         .admin-controls {
-            display: none;
-            margin-left: 10px;
-            cursor: pointer;
             color: red;
+            cursor: pointer;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -110,7 +109,9 @@
             ordersDiv.innerHTML = '';
             orders.forEach((order, index) => {
                 let adminControls = isAdmin ? `<span class='admin-controls' onclick='deleteOrder(${index})'>[X]</span>` : '';
-                ordersDiv.innerHTML += `<p><strong>${order.name}</strong> pediu uma pizza <strong>${order.pizza}</strong> ${adminControls}</p>`;
+                let orderElement = document.createElement('p');
+                orderElement.innerHTML = `<strong>${order.name}</strong> pediu uma pizza <strong>${order.pizza}</strong> ${adminControls}`;
+                ordersDiv.appendChild(orderElement);
             });
         }
 
