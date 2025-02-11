@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido de Pizza</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #fff;
+            border-radius: 10px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+        input, select {
+            background-color: #222;
+            color: #fff;
+        }
+        button {
+            background-color: #fff;
+            color: #000;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ddd;
+        }
+        .orders {
+            margin-top: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Faça seu Pedido</h1>
+        <form id="orderForm">
+            <input type="text" id="name" placeholder="Seu Nome" required>
+            <select id="pizza" required>
+                <option value="Margherita">Margherita</option>
+                <option value="Pepperoni">Pepperoni</option>
+                <option value="Quatro Queijos">Quatro Queijos</option>
+            </select>
+            <button type="submit">Enviar Pedido</button>
+        </form>
+        <h2>Pedidos Recebidos</h2>
+        <div class="orders" id="orders"></div>
+    </div>
 
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let name = document.getElementById('name').value;
+            let pizza = document.getElementById('pizza').value;
+            let order = { name, pizza };
+            
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            document.getElementById('orderForm').reset();
+            loadOrders();
+        });
+
+        function loadOrders() {
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+            let ordersDiv = document.getElementById('orders');
+            ordersDiv.innerHTML = '';
+            orders.forEach((order, index) => {
+                ordersDiv.innerHTML += `<p><strong>${order.name}</strong> pediu uma pizza <strong>${order.pizza}</strong></p>`;
+            });
+        }
+
+        loadOrders();
+    </script>
+</body>
+</html>
