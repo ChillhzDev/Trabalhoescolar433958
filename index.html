@@ -41,10 +41,14 @@
             margin-top: 20px;
             text-align: left;
         }
-        .admin-code {
+        .admin-code-container {
             position: absolute;
             top: 10px;
             right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        .admin-code {
             padding: 5px;
             width: 100px;
             background-color: #222;
@@ -61,7 +65,10 @@
     </style>
 </head>
 <body>
-    <input type="password" id="adminCode" class="admin-code" placeholder="Código ADM">
+    <div class="admin-code-container">
+        <input type="password" id="adminCode" class="admin-code" placeholder="Código ADM">
+        <button onclick="checkAdmin()">OK</button>
+    </div>
     <div class="container">
         <h1>Faça seu Pedido</h1>
         <form id="orderForm">
@@ -78,6 +85,14 @@
     </div>
 
     <script>
+        let isAdmin = false;
+        
+        function checkAdmin() {
+            let adminCode = document.getElementById('adminCode').value;
+            isAdmin = adminCode === 'friesforhave';
+            loadOrders();
+        }
+
         document.getElementById('orderForm').addEventListener('submit', function(event) {
             event.preventDefault();
             let name = document.getElementById('name').value;
@@ -92,22 +107,21 @@
         function loadOrders() {
             let orders = JSON.parse(localStorage.getItem('orders')) || [];
             let ordersDiv = document.getElementById('orders');
-            let adminCode = document.getElementById('adminCode').value;
             ordersDiv.innerHTML = '';
             orders.forEach((order, index) => {
-                let adminControls = adminCode === 'friesforhave' ? `<span class='admin-controls' onclick='deleteOrder(${index})'>[X]</span>` : '';
+                let adminControls = isAdmin ? `<span class='admin-controls' onclick='deleteOrder(${index})'>[X]</span>` : '';
                 ordersDiv.innerHTML += `<p><strong>${order.name}</strong> pediu uma pizza <strong>${order.pizza}</strong> ${adminControls}</p>`;
             });
         }
 
         function deleteOrder(index) {
+            if (!isAdmin) return;
             let orders = JSON.parse(localStorage.getItem('orders')) || [];
             orders.splice(index, 1);
             localStorage.setItem('orders', JSON.stringify(orders));
             loadOrders();
         }
 
-        document.getElementById('adminCode').addEventListener('input', loadOrders);
         loadOrders();
     </script>
 </body>
