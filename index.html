@@ -10,6 +10,7 @@
             background-color: #000;
             color: #fff;
             text-align: center;
+            overflow: hidden;
         }
         .container {
             max-width: 600px;
@@ -17,6 +18,8 @@
             padding: 20px;
             border: 1px solid #808080;
             border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
         }
         input, select, button {
             width: 100%;
@@ -41,34 +44,47 @@
             margin-top: 20px;
             text-align: left;
         }
-        .admin-code-container {
+        .animation-container {
+            position: fixed;
+            bottom: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            transition: bottom 1s ease-in-out;
+        }
+        .pizza {
+            width: 150px;
+        }
+        .welcome-box {
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            position: relative;
+        }
+        .close-btn {
             position: absolute;
-            top: 10px;
+            top: 5px;
             right: 10px;
-            display: flex;
-            gap: 5px;
-        }
-        .admin-code {
-            padding: 5px;
-            width: 100px;
-            background-color: #222;
-            color: #fff;
-            border: 1px solid #808080;
-            border-radius: 5px;
-        }
-        .admin-controls {
-            color: red;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
             cursor: pointer;
-            margin-left: 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="admin-code-container">
-        <input type="password" id="adminCode" class="admin-code" placeholder="Código ADM">
-        <button onclick="checkAdmin()">OK</button>
+    <div class="animation-container" id="animation">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/9/92/Neapolitan_pizza.jpg" class="pizza" alt="Pizza">
+        <div class="welcome-box">
+            <button class="close-btn" onclick="closeAnimation()">X</button>
+            <p><strong>Bem-vindo, aqui realizamos os pedidos</strong></p>
+        </div>
     </div>
-    <div class="container">
+    <div class="container" id="mainContent">
         <h1>Faça seu Pedido</h1>
         <form id="orderForm">
             <input type="text" id="name" placeholder="Seu Nome" required>
@@ -83,48 +99,27 @@
         <h2>Pedidos Recebidos</h2>
         <div class="orders" id="orders"></div>
     </div>
-
+    
     <script>
-        let isAdmin = false;
-        
-        function checkAdmin() {
-            let adminCode = document.getElementById('adminCode').value;
-            isAdmin = adminCode === 'friesforhave';
-            loadOrders();
-        }
-
-        document.getElementById('orderForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let name = document.getElementById('name').value;
-            let pizza = document.getElementById('pizza').value;
-            let orders = JSON.parse(localStorage.getItem('orders')) || [];
-            orders.push({ name, pizza });
-            localStorage.setItem('orders', JSON.stringify(orders));
-            document.getElementById('orderForm').reset();
-            loadOrders();
+        document.addEventListener("DOMContentLoaded", function() {
+            let animation = document.getElementById("animation");
+            let mainContent = document.getElementById("mainContent");
+            setTimeout(() => {
+                animation.style.bottom = "30%";
+            }, 500);
+            mainContent.style.pointerEvents = "none";
         });
 
-        function loadOrders() {
-            let orders = JSON.parse(localStorage.getItem('orders')) || [];
-            let ordersDiv = document.getElementById('orders');
-            ordersDiv.innerHTML = '';
-            orders.forEach((order, index) => {
-                let adminControls = isAdmin ? `<span class='admin-controls' onclick='deleteOrder(${index})'>[X]</span>` : '';
-                let orderElement = document.createElement('p');
-                orderElement.innerHTML = `<strong>${order.name}</strong> pediu uma pizza <strong>${order.pizza}</strong> ${adminControls}`;
-                ordersDiv.appendChild(orderElement);
-            });
+        function closeAnimation() {
+            let animation = document.getElementById("animation");
+            let mainContent = document.getElementById("mainContent");
+            animation.style.bottom = "-200px";
+            setTimeout(() => {
+                animation.remove();
+                mainContent.style.opacity = "1";
+                mainContent.style.pointerEvents = "auto";
+            }, 1000);
         }
-
-        function deleteOrder(index) {
-            if (!isAdmin) return;
-            let orders = JSON.parse(localStorage.getItem('orders')) || [];
-            orders.splice(index, 1);
-            localStorage.setItem('orders', JSON.stringify(orders));
-            loadOrders();
-        }
-
-        loadOrders();
     </script>
 </body>
 </html>
